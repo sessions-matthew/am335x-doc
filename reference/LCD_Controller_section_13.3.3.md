@@ -1,0 +1,23 @@
+<!-- image -->
+
+www.ti.com
+
+## 13.3.2 LCD External I/O Signals
+
+Table 13-4 shows the details of the LCD controller external signals.
+
+## Table 13-4. LCD External I/O Signals
+
+| Signal         | Type         | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
+|----------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| LCD_VSYNC      | OUT          | Raster controller: Frame clock the LCD uses to signal the start of a new frame of pixels. Also used by TFT displays as the vertical synchronization signal. LIDD character: Register select (RS) or address latch enable (ALE) LIDD graphics: Address bit 0 (A0) or command/data select (C/D)                                                                                                                                       |
+| LCD_HSYNC      | OUT          | Raster controller: Line clock the LCD uses to signal the end of a line of pixels that transfers line data from the shift register to the screen and to increment the line pointer(s). Also used by TFT displays as the horizontal synchronization signal. LIDD character: not used. LIDD graphics: • 6800 mode = read or write enable • 8080 mode = not write strobe                                                                |
+| LCD_PCLK       | OUT          | Raster controller: Pixel clock the LCD uses to clock the pixel data into the line shift register. In passive mode, the pixel clock transitions only when valid data is available on the data lines. In active mode, the pixel clock transitions continuously, and the ac-bias pin is used as an output enable to signal when data is available on the LCD pin. LIDD character: not used. LIDD graphics: • 6800 mode = enable strobe |
+| LCD_AC_BIAS_EN | OUT          | Raster controller: ac-bias used to signal the LCD to switch the polarity of the power supplies to the row and column axis of the screen to counteract DC offset. Used in TFT mode as the output enable to signal when data is latched from the data pins using the pixel clock. LIDD character: Primary enable strobe LIDD graphics: Chip select 0 (CS0)                                                                            |
+| LCD_MCLK       | OUT          | Raster controller: not used. LIDD character: Secondary enable strobe LIDD graphics: Chip select 1 (CS1)                                                                                                                                                                                                                                                                                                                             |
+| LCD_D[23:0]    | Raster: OUT  | LCD data bus, providing a 4-, 8-, 16- or 24-bit data path. Raster controller: For monochrome displays, each signal represents a pixel; for passive color displays, groupings of three signals represent one pixel (red, green, and blue). LCD_DATA[3:0] is used for monochrome displays of 2, 4, and 8 BPP; LCD_DATA[7:0] is used for color STN displays and LCD_DATA[15:0] or LCD_DATA[23:0] is used for active (TFT) mode.        |
+|                | LIDD: OUT/IN | LIDD character: LCD_DATA[15:0] Read and write the command and data registers. LIDD graphics: LCD_DATA[15:0] Read and write the command and data registers.                                                                                                                                                                                                                                                                          |
+
+## 13.3.3 Pin Mapping and Color Assignments
+
+Due to a silicon bug, pin mapping for the data signals for RGB888 and RGB565 are not as designed. Refer to the AM335x Silicon Errata (SPRZ360) for proper pin mapping and color assignments when using these modes with an LCD panel.

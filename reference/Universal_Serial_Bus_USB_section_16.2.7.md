@@ -1,0 +1,35 @@
+- The start address of the FIFO within the RAM block
+- The maximum size of packet to be supported
+- Whether double-buffering is required
+
+(These last two together define the amount of space that needs to be allocated to the FIFO.)
+
+It is the responsibility of the firmware to ensure that all the Tx and Rx endpoints (other than endpoint 0) that are active in the current USB configuration have a block of FIFO RAM allocated for their use. The maximum FIFO size for endpoint 0 required is 64 bytes deep and which is large enough to buffer one packet. For this reason, the first 64 bytes of FIFO memory is reserved for Endpoint 0 usage and this resource allocation is implied to be available at all times and no FIFO allocation is required for Endpoint 0. For endpoints other than endpoint 0, the FIFO RAM interface is configurable and must have a minimum size of 8 bytes and should be capable of buffering either 1 or 2 packets. Separate FIFOs may be associated with each endpoint: alternatively a Tx endpoint and the Rx endpoint with the same Endpoint number can be configured to use the same FIFO, to reduce the size of RAM block needed, provided they can never be active at the same time.
+
+NOTE: The option of dynamically setting FIFO sizes only applies to Endpoints 1-15. Endpoint 0 FIFO has a fixed size (64 bytes) and a fixed location which is the first 64 Bytes of FIFO (FIFO addresses 0-63).
+
+## 16.2.7 USB Controller Host and Peripheral Modes Operation
+
+The two USB modules can be used in a range of different environments. They can be used as either a high-speed or a full-speed USB peripheral device attached to a conventional USB host (such as a PC) in a point-to-point type of arrangement. As a host, the USB modules can also be used with another peripheral device of any speed (high-,full-, or low-speed) in a point-to-point arrangement or can be used as the host to a range of peripheral devices in a multi-point setup; one-to-many via hub. Note that the role each USB controller is assuming is independent of each other. Two options (h/w or s/w) exist for a USB role assumption/configuration.
+
+For a USB Peripheral configuration the user has the option of using the cable end to select the role by attaching the mini or micro b side of the cable (can consider this as a h/w option) or use the optional method where the firmware is required to program the respective USB Mode Register IDDIG bit field with a value of '1' prior to the USB controller goes into session (can consider this as a s/w option).
+
+Similarly, for a USB host configuration the user has the option of using the cable end to select the role by attaching the mini or micro a side of the cable (can consider this as a h/w option) or use the optional method where the firmware is required to program the respective USB Mode Register IDDIG bit field with a value of '0' value prior to the USB controller going into session (can consider this as a s/w option).
+
+When using the s/w option, the USB ID pin state is ignored/bypassed (this is a similar configuration where an ID pin does not exist) and the USB2.0 controller role adaptation of a host or peripheral (device) is dependent upon the state of the respective USB Mode Register IDDIG field. If the IDDIG field is programmed by the user with a value of '1' prior to the USB going into session, it would assume the role of a peripheral/device. However, if the IDDIG field is programmed with the value of '0', the USB controller will assume the role of a host. What this means is that the USB cable end, connector, will not be able to control the role of the OTG controller and the user needs to be aware of the firmware program setting prior to performing a USB connection.
+
+The procedure for the USB2.0 OTG controller determining its operating modes (usb controller assuming a role of a host or a peripheral) starts when the USB 2.0 controller goes into a session. The USB 2.0 controller is in session when either it senses a voltage (&gt;= 4.4V) on the USBx\_VBUSIN pin and the controller sets its DEVCTL[SESSION] bit field or when the firmware sets the DEVCTL[SESSION] bit; assuming that it will operating as a host.
+
+When the DEVCTL[SESSION] bit is set, the controller will start sensing the state of the Iddig signal, which in turn is controlled either by the USBx\_ID pin (h/w option) or by the IDDIG bit field of the MODE Register (s/w option). If the state of the iddig signal is found to be low (IDDIG is programmed with '0') then the USB2.0 controller will assume the role of a host and when it finds the iddig signal to be high (IDDIG is programmed with '1') then it will assume the role of a device. Note that iddig is an internal signal that could be driven to high or low via firmware from dedicated registers.
+
+<!-- image -->
+
+www.ti.com
+
+<!-- image -->
+
+www.ti.com
+
+Upon the USB controller determining its role as a host, it will drive the USBx\_DRVVBUS pin high to enable the external power logic so that it start sourcing the required 5V power (must be ≥ 4.4V but to account for the voltage drop on the cable it is suggested to be in the neighborhood of 4.75V). The USB2.0 controller will then wait to for the voltage of the USBx\_VBUSIN to go high. After 100 ms, if it does not see the voltage on the USBX\_VBUSIN pin to be within a Vbus Valid range (&gt;= 4.4V), it will generate a Vbus error interrupt. Assuming that the voltage level of the USBX\_VBUSIN is found to within the Vbus Valid range, the USB 2.0 host controller will wait for a device to connect; that is for it to see one of its data lines USB0/1\_DP/DM be pulled high.
+
+When assuming the role of a peripheral, assuming that the firmware has set the POWER[SOFTCONN] bit, and the USBx\_ID pin is floating (h/w option) or USBx Mode Register IDDIG bit field is programmed with '1' (s/w option) and an external host is sourcing power on the USBx\_VBUSIN line then the USB2.0 controller will set the DEVCTL[SESSION] bit instructing the controller to go into session. Not that the voltage on the USBx\_VBUSIN pin must be within Vbus Valid range (i.e. greater or equal to 4.4V). When the controller goes into session, it will force the USB2.0 Controller to sense the state of the iddig signal. Once it senses iddig signal to be high, it will enable its 1.5Kohm pull-up resistor to signify the external host that it is a FullSpeed device. Note that even when operating as a High-Speed peripheral; the USB controller has to first come up as Full-Speed and then later transition to High-Speed. The USB2.0 controller will then waits for a reset signal from the external host. Then after, if High-Speed option has been selected it will negotiate for a High-Speed operation and if its request has been accepted by the host, it will enable its precision 45ohm termination resistors (to stop signal reflection) on its data lines and disable the 1.5Kohm resistor.
