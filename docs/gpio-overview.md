@@ -7,14 +7,7 @@ The AM335x family includes a comprehensive General-Purpose Input/Output (GPIO) s
 ## GPIO Architecture
 
 ### GPIO Banks and Organization  
-The AM335x family contains **four independent GPIO banks** (GPIO0-3), each supporting 32 I/O pins. **All GPIO banks are available on the AM3358**:
-
-| Bank | Base Address | Clock Domain | Pin Range | Power Domain | IRQ | AM3358 |
-|------|-------------|--------------|-----------|--------------|-----|---------|
-| **GPIO0** | 0x44E07000 | WKUP | GPIO0_0 - GPIO0_31 | Always-on | 96 | ✅ Available |
-| **GPIO1** | 0x4804C000 | L4PER | GPIO1_0 - GPIO1_31 | Peripheral | 98 | ✅ Available |
-| **GPIO2** | 0x481AC000 | L4PER | GPIO2_0 - GPIO2_31 | Peripheral | 32 | ✅ Available |
-| **GPIO3** | 0x481AE000 | L4PER | GPIO3_0 - GPIO3_31 | Peripheral | 62 | ✅ Available |
+The AM335x family contains **four independent GPIO banks** (GPIO0-3), each supporting 32 I/O pins.
 
 **Total GPIO Pins**: 128 (4 banks × 32 pins each)
 
@@ -86,6 +79,8 @@ Each GPIO bank contains the same register set:
 4. **Control Registers**: Pin direction and special functions
 
 ### Core GPIO Registers (per bank)
+
+The address of each register is calculated by adding the offset to the base address. For example the address of GPIO2_OE is calculated as 0x481AC000 + 0x134 = 0x481AC134.
 
 | Offset | Register | Access | Purpose |
 |--------|----------|--------|---------|
@@ -266,14 +261,129 @@ Located in Control Module address space (0x44E10000 base):
 - **Performance Problems**: Consider using atomic operations and optimizing interrupt handlers
 
 ## Programming Examples
+## GPIO Usage - Configure GPIO1 Pin as Output
 
-For complete programming examples, configuration sequences, and register access patterns, see:
-- [GPIO Programming Guide](../../implementation/gpio-usage.md) - Comprehensive register programming examples
-- [Pin Multiplexing Implementation](../../implementation/pinmux-usage.md) - Pin configuration examples
+### Overview
+This document provides pseudocode for configuring a pin on GPIO1 as an output on the AM335x.
+
+### GPIO1 Configuration Pseudocode
+
+#### Step 1: Enable GPIO1 Module Clock
+
+```pseudocode
+// Enable GPIO1 module in CM_PER (Clock Module Peripheral)
+// Register: CM_PER_GPIO1_CLKCTRL at offset 0xAC
+
+WRITE32(CM_PER_BASE + 0xAC, 0x2)  // Enable module, functional and interface clocks
+
+// Wait for module to be fully functional
+while ((READ32(CM_PER_BASE + 0xAC) & 0x30000) != 0x0) {
+    // Wait until IDLEST bits indicate module is functional
+}
+```
+
+#### Step 2: Configure Pin Muxing
+
+```pseudocode
+// Configure the control module to mux the pad to GPIO mode
+// Example: Configure GPIO1_28 (which might be on pad gpmc_ben1)
+// Register: CONF_GPMC_BEN1 at Control Module offset
+
+WRITE32(CONTROL_MODULE_BASE + PAD_OFFSET, 0x07)  // Mode 7 = GPIO mode
+                                                   // Can OR with:
+                                                   // 0x00 - No pull up/down
+                                                   // 0x10 - Pull up enabled
+                                                   // 0x08 - Pull down enabled
+                                                   // 0x20 - Receiver enabled (for input)
+```
+
+#### Step 3: Set GPIO1 Pin as Output
+
+```pseudocode
+// GPIO1 Base Address: 0x4804C000
+GPIO1_BASE = 0x4804C000
+
+// Define register offsets
+GPIO_OE_OFFSET        = 0x134  // Output Enable register
+GPIO_DATAOUT_OFFSET   = 0x13C  // Data Output register
+GPIO_CLEARDATAOUT_OFFSET = 0x190  // Clear Data Output register
+GPIO_SETDATAOUT_OFFSET   = 0x194  // Set Data Output register
+
+// Choose which pin (0-31)
+PIN_NUMBER = 28  // Example: GPIO1_28
+PIN_MASK = (1 << PIN_NUMBER)
+
+// Configure pin as OUTPUT by clearing the bit in GPIO_OE
+// 0 = Output, 1 = Input
+current_oe = READ32(GPIO1_BASE + GPIO_OE_OFFSET)
+current_oe = current_oe & ~PIN_MASK  // Clear bit to make it output
+WRITE32(GPIO1_BASE + GPIO_OE_OFFSET, current_oe)
+```
+
+### Step 4: Set Output Value
+
+```pseudocode
+// Method 1: Using SETDATAOUT/CLEARDATAOUT (atomic operations)
+// Set pin HIGH
+WRITE32(GPIO1_BASE + GPIO_SETDATAOUT_OFFSET, PIN_MASK)
+
+// Set pin LOW
+WRITE32(GPIO1_BASE + GPIO_CLEARDATAOUT_OFFSET, PIN_MASK)
+
+// Method 2: Using DATAOUT register (read-modify-write)
+// Set pin HIGH
+current_data = READ32(GPIO1_BASE + GPIO_DATAOUT_OFFSET)
+WRITE32(GPIO1_BASE + GPIO_DATAOUT_OFFSET, current_data | PIN_MASK)
+
+// Set pin LOW
+current_data = READ32(GPIO1_BASE + GPIO_DATAOUT_OFFSET)
+WRITE32(GPIO1_BASE + GPIO_DATAOUT_OFFSET, current_data & ~PIN_MASK)
+```
+
+### Complete Example: Configure GPIO1_28 as Output and Toggle
+
+```pseudocode
+// Constants
+CM_PER_BASE = 0x44E00000
+CM_PER_GPIO1_CLKCTRL = 0xAC
+CONTROL_MODULE_BASE = 0x44E10000
+CONF_GPMC_BEN1 = 0x878  // Example pad for GPIO1_28
+GPIO1_BASE = 0x4804C000
+GPIO_OE = 0x134
+GPIO_SETDATAOUT = 0x194
+GPIO_CLEARDATAOUT = 0x190
+
+PIN = 28
+PIN_MASK = (1 << PIN)
+
+// 1. Enable GPIO1 clock
+WRITE32(CM_PER_BASE + CM_PER_GPIO1_CLKCTRL, 0x2)
+while ((READ32(CM_PER_BASE + CM_PER_GPIO1_CLKCTRL) & 0x30000) != 0x0) {
+    // Wait for module ready
+}
+
+// 2. Configure pin mux to GPIO mode
+WRITE32(CONTROL_MODULE_BASE + CONF_GPMC_BEN1, 0x07)  // Mode 7 = GPIO
+
+// 3. Set as output
+oe_value = READ32(GPIO1_BASE + GPIO_OE)
+oe_value = oe_value & ~PIN_MASK  // Clear bit = output
+WRITE32(GPIO1_BASE + GPIO_OE, oe_value)
+
+// 4. Toggle the pin
+WRITE32(GPIO1_BASE + GPIO_SETDATAOUT, PIN_MASK)     // Set HIGH
+delay(1000)
+WRITE32(GPIO1_BASE + GPIO_CLEARDATAOUT, PIN_MASK)   // Set LOW
+delay(1000)
+```
+
+### Important Notes
+
+1. **Clock Enable First**: Always enable the module clock before accessing GPIO registers
+2. **Pin Muxing**: Verify correct pad configuration in the Control Module
+3. **Output Enable**: Clear the bit in GPIO_OE to configure as output (0=output)
+4. **Atomic Operations**: Prefer SETDATAOUT/CLEARDATAOUT for thread-safe bit manipulation
+5. **GPIO Instances**: AM335x has GPIO0, GPIO1, GPIO2, GPIO3 (each with 32 pins)
 
 ## Related Documentation
-- [GPIO Register Reference](../../registers/gpio-registers.md) - Complete register descriptions
-- [Pin Multiplexing Guide](./pinmux.md) - Control Module pin configuration  
-- [Clock Management](../../clocking/peripheral-clock-management.md) - GPIO clock setup
-- [Interrupt System](../../interrupts/interrupt-system.md) - GPIO interrupt integration
-- [Power Management](../../power/power-management.md) - GPIO power optimization
+- [GPIO Register Reference](gpio-registers.md) - Complete register descriptions

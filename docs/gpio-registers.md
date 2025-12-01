@@ -17,6 +17,14 @@ This document provides complete register-level documentation for the AM3358 GPIO
 
 ## GPIO Register Map
 
+The address of each register is calculated by adding the offset to the base address. 
+
+Examples:
+- the address of GPIO2_OE is ALWAYS calculated as 0x481AC000 (GPIO2) + 0x134 (GPIO_OE) = 0x481AC134 (GPIO2_OE). 
+- GPIO2_OE is ALWAYS calculated as GPIO2 + GPIO_OE
+
+Note that _OE in GPIO2_OE directly refers to GPIO_OE and is an exact match the table below for GPIO_OE.
+
 Each GPIO bank contains the following register set:
 
 | Offset | Register | Access | Reset | Description |
@@ -288,6 +296,135 @@ Each GPIO bank contains the following register set:
 
 ## Register Access Patterns
 
+
+## GPIO Register Map - Absolute Addresses Pre-Calculated
+
+Quick reference table with absolute addresses for all GPIO registers.
+
+### GPIO0 (Base: 0x44E07000)
+
+| Address | Register | Description |
+|---------|----------|-------------|
+| 0x44E07000 | GPIO0_REVISION | Module Revision Identifier |
+| 0x44E07010 | GPIO0_SYSCONFIG | System Configuration |
+| 0x44E07020 | GPIO0_EOI | End of Interrupt |
+| 0x44E07024 | GPIO0_IRQSTATUS_RAW_0 | Raw Interrupt Status (Line 0) |
+| 0x44E07028 | GPIO0_IRQSTATUS_RAW_1 | Raw Interrupt Status (Line 1) |
+| 0x44E0702C | GPIO0_IRQSTATUS_0 | Interrupt Status (Line 0) |
+| 0x44E07030 | GPIO0_IRQSTATUS_1 | Interrupt Status (Line 1) |
+| 0x44E07034 | GPIO0_IRQSTATUS_SET_0 | Interrupt Enable Set (Line 0) |
+| 0x44E07038 | GPIO0_IRQSTATUS_SET_1 | Interrupt Enable Set (Line 1) |
+| 0x44E0703C | GPIO0_IRQSTATUS_CLR_0 | Interrupt Enable Clear (Line 0) |
+| 0x44E07040 | GPIO0_IRQSTATUS_CLR_1 | Interrupt Enable Clear (Line 1) |
+| 0x44E07044 | GPIO0_IRQWAKEN_0 | Wake-up Enable (Line 0) |
+| 0x44E07048 | GPIO0_IRQWAKEN_1 | Wake-up Enable (Line 1) |
+| 0x44E07114 | GPIO0_SYSSTATUS | System Status |
+| 0x44E07130 | GPIO0_CTRL | Module Control |
+| 0x44E07134 | GPIO0_OE | Output Enable |
+| 0x44E07138 | GPIO0_DATAIN | Input Data |
+| 0x44E0713C | GPIO0_DATAOUT | Output Data |
+| 0x44E07140 | GPIO0_LEVELDETECT0 | Low Level Detection Enable |
+| 0x44E07144 | GPIO0_LEVELDETECT1 | High Level Detection Enable |
+| 0x44E07148 | GPIO0_RISINGDETECT | Rising Edge Detection Enable |
+| 0x44E0714C | GPIO0_FALLINGDETECT | Falling Edge Detection Enable |
+| 0x44E07150 | GPIO0_DEBOUNCENABLE | Debounce Enable |
+| 0x44E07154 | GPIO0_DEBOUNCINGTIME | Debounce Timing |
+| 0x44E07190 | GPIO0_CLEARDATAOUT | Clear Output Data |
+| 0x44E07194 | GPIO0_SETDATAOUT | Set Output Data |
+
+### GPIO1 (Base: 0x4804C000)
+
+| Address | Register | Description |
+|---------|----------|-------------|
+| 0x4804C000 | GPIO1_REVISION | Module Revision Identifier |
+| 0x4804C010 | GPIO1_SYSCONFIG | System Configuration |
+| 0x4804C020 | GPIO1_EOI | End of Interrupt |
+| 0x4804C024 | GPIO1_IRQSTATUS_RAW_0 | Raw Interrupt Status (Line 0) |
+| 0x4804C028 | GPIO1_IRQSTATUS_RAW_1 | Raw Interrupt Status (Line 1) |
+| 0x4804C02C | GPIO1_IRQSTATUS_0 | Interrupt Status (Line 0) |
+| 0x4804C030 | GPIO1_IRQSTATUS_1 | Interrupt Status (Line 1) |
+| 0x4804C034 | GPIO1_IRQSTATUS_SET_0 | Interrupt Enable Set (Line 0) |
+| 0x4804C038 | GPIO1_IRQSTATUS_SET_1 | Interrupt Enable Set (Line 1) |
+| 0x4804C03C | GPIO1_IRQSTATUS_CLR_0 | Interrupt Enable Clear (Line 0) |
+| 0x4804C040 | GPIO1_IRQSTATUS_CLR_1 | Interrupt Enable Clear (Line 1) |
+| 0x4804C044 | GPIO1_IRQWAKEN_0 | Wake-up Enable (Line 0) |
+| 0x4804C048 | GPIO1_IRQWAKEN_1 | Wake-up Enable (Line 1) |
+| 0x4804C114 | GPIO1_SYSSTATUS | System Status |
+| 0x4804C130 | GPIO1_CTRL | Module Control |
+| 0x4804C134 | GPIO1_OE | Output Enable |
+| 0x4804C138 | GPIO1_DATAIN | Input Data |
+| 0x4804C13C | GPIO1_DATAOUT | Output Data |
+| 0x4804C140 | GPIO1_LEVELDETECT0 | Low Level Detection Enable |
+| 0x4804C144 | GPIO1_LEVELDETECT1 | High Level Detection Enable |
+| 0x4804C148 | GPIO1_RISINGDETECT | Rising Edge Detection Enable |
+| 0x4804C14C | GPIO1_FALLINGDETECT | Falling Edge Detection Enable |
+| 0x4804C150 | GPIO1_DEBOUNCENABLE | Debounce Enable |
+| 0x4804C154 | GPIO1_DEBOUNCINGTIME | Debounce Timing |
+| 0x4804C190 | GPIO1_CLEARDATAOUT | Clear Output Data |
+| 0x4804C194 | GPIO1_SETDATAOUT | Set Output Data |
+
+### GPIO2 (Base: 0x481AC000)
+
+| Address | Register | Description |
+|---------|----------|-------------|
+| 0x481AC000 | GPIO2_REVISION | Module Revision Identifier |
+| 0x481AC010 | GPIO2_SYSCONFIG | System Configuration |
+| 0x481AC020 | GPIO2_EOI | End of Interrupt |
+| 0x481AC024 | GPIO2_IRQSTATUS_RAW_0 | Raw Interrupt Status (Line 0) |
+| 0x481AC028 | GPIO2_IRQSTATUS_RAW_1 | Raw Interrupt Status (Line 1) |
+| 0x481AC02C | GPIO2_IRQSTATUS_0 | Interrupt Status (Line 0) |
+| 0x481AC030 | GPIO2_IRQSTATUS_1 | Interrupt Status (Line 1) |
+| 0x481AC034 | GPIO2_IRQSTATUS_SET_0 | Interrupt Enable Set (Line 0) |
+| 0x481AC038 | GPIO2_IRQSTATUS_SET_1 | Interrupt Enable Set (Line 1) |
+| 0x481AC03C | GPIO2_IRQSTATUS_CLR_0 | Interrupt Enable Clear (Line 0) |
+| 0x481AC040 | GPIO2_IRQSTATUS_CLR_1 | Interrupt Enable Clear (Line 1) |
+| 0x481AC044 | GPIO2_IRQWAKEN_0 | Wake-up Enable (Line 0) |
+| 0x481AC048 | GPIO2_IRQWAKEN_1 | Wake-up Enable (Line 1) |
+| 0x481AC114 | GPIO2_SYSSTATUS | System Status |
+| 0x481AC130 | GPIO2_CTRL | Module Control |
+| 0x481AC134 | GPIO2_OE | Output Enable |
+| 0x481AC138 | GPIO2_DATAIN | Input Data |
+| 0x481AC13C | GPIO2_DATAOUT | Output Data |
+| 0x481AC140 | GPIO2_LEVELDETECT0 | Low Level Detection Enable |
+| 0x481AC144 | GPIO2_LEVELDETECT1 | High Level Detection Enable |
+| 0x481AC148 | GPIO2_RISINGDETECT | Rising Edge Detection Enable |
+| 0x481AC14C | GPIO2_FALLINGDETECT | Falling Edge Detection Enable |
+| 0x481AC150 | GPIO2_DEBOUNCENABLE | Debounce Enable |
+| 0x481AC154 | GPIO2_DEBOUNCINGTIME | Debounce Timing |
+| 0x481AC190 | GPIO2_CLEARDATAOUT | Clear Output Data |
+| 0x481AC194 | GPIO2_SETDATAOUT | Set Output Data |
+
+### GPIO3 (Base: 0x481AE000)
+
+| Address | Register | Description |
+|---------|----------|-------------|
+| 0x481AE000 | GPIO3_REVISION | Module Revision Identifier |
+| 0x481AE010 | GPIO3_SYSCONFIG | System Configuration |
+| 0x481AE020 | GPIO3_EOI | End of Interrupt |
+| 0x481AE024 | GPIO3_IRQSTATUS_RAW_0 | Raw Interrupt Status (Line 0) |
+| 0x481AE028 | GPIO3_IRQSTATUS_RAW_1 | Raw Interrupt Status (Line 1) |
+| 0x481AE02C | GPIO3_IRQSTATUS_0 | Interrupt Status (Line 0) |
+| 0x481AE030 | GPIO3_IRQSTATUS_1 | Interrupt Status (Line 1) |
+| 0x481AE034 | GPIO3_IRQSTATUS_SET_0 | Interrupt Enable Set (Line 0) |
+| 0x481AE038 | GPIO3_IRQSTATUS_SET_1 | Interrupt Enable Set (Line 1) |
+| 0x481AE03C | GPIO3_IRQSTATUS_CLR_0 | Interrupt Enable Clear (Line 0) |
+| 0x481AE040 | GPIO3_IRQSTATUS_CLR_1 | Interrupt Enable Clear (Line 1) |
+| 0x481AE044 | GPIO3_IRQWAKEN_0 | Wake-up Enable (Line 0) |
+| 0x481AE048 | GPIO3_IRQWAKEN_1 | Wake-up Enable (Line 1) |
+| 0x481AE114 | GPIO3_SYSSTATUS | System Status |
+| 0x481AE130 | GPIO3_CTRL | Module Control |
+| 0x481AE134 | GPIO3_OE | Output Enable |
+| 0x481AE138 | GPIO3_DATAIN | Input Data |
+| 0x481AE13C | GPIO3_DATAOUT | Output Data |
+| 0x481AE140 | GPIO3_LEVELDETECT0 | Low Level Detection Enable |
+| 0x481AE144 | GPIO3_LEVELDETECT1 | High Level Detection Enable |
+| 0x481AE148 | GPIO3_RISINGDETECT | Rising Edge Detection Enable |
+| 0x481AE14C | GPIO3_FALLINGDETECT | Falling Edge Detection Enable |
+| 0x481AE150 | GPIO3_DEBOUNCENABLE | Debounce Enable |
+| 0x481AE154 | GPIO3_DEBOUNCINGTIME | Debounce Timing |
+| 0x481AE190 | GPIO3_CLEARDATAOUT | Clear Output Data |
+| 0x481AE194 | GPIO3_SETDATAOUT | Set Output Data |
+
 ### Configuration Sequence
 1. **Clock Enable**: Enable module clocks via PRCM
 2. **System Config**: Configure SYSCONFIG for desired power management
@@ -309,15 +446,5 @@ Each GPIO bank contains the following register set:
 - **Interrupt Latency**: Minimize interrupt handler execution time
 - **Power Management**: Use appropriate idle modes and wake-up configuration
 
-## Implementation Examples
-
-For complete programming examples, register access patterns, and configuration sequences, see:
-- [GPIO Programming Guide](../implementation/gpio-usage.md) - Complete register programming examples
-
 ## Related Documentation
-
-- [GPIO System Overview](../peripherals/gpio/gpio-overview.md) - High-level GPIO architecture
-- [Pin Multiplexing Guide](../peripherals/gpio/pinmux.md) - Control Module pin configuration  
-- [Clock Management](../clocking/peripheral-clock-management.md) - GPIO clock setup
-- [Interrupt System](../interrupts/interrupt-system.md) - GPIO interrupt integration
-- [Control Module Registers](./control-registers.md) - Pin mux register reference
+- [GPIO System Overview](gpio-overview.md) - High-level GPIO architecture

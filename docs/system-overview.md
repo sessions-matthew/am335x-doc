@@ -142,10 +142,15 @@ The AM335x family includes several variants with different feature sets:
 
 ## Related Documentation
 
-- [DMTIMER Register Reference](../registers/AM335x_DMTIMER_Register_Reference.md)
-- [Memory Map Overview](../memory-map/system-memory-map.md)
-- [Interrupt System](../interrupts/interrupt-system.md)
-- [PRU-ICSS Detailed Guide](../peripherals/pru-icss/overview.md)
+- [DMTIMER Register Reference](timer-registers.md)
+- [DMTIMER Overview](dmtimer-overview.md)
+- [Timer System Overview](timer-system-overview.md)
+- [Interrupt System Overview](interrupt-system.md)
+- [Interrupt Implementation Guide](interrupt-overview.md)
+- [PRU-ICSS Interrupt System](pru-interrupt-overview.md)
+- [Clock Management System](clock-system-overview.md)
+- [GPIO System Overview](gpio-overview.md)
+- [UART Overview](uart-overview.md)
 
 ## References
 
